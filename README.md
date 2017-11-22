@@ -1,5 +1,7 @@
 # Client
 
+[![Build Status](https://travis-ci.org/pepibumur/client.svg?branch=master)](https://travis-ci.org/pepibumur/client)
+
 Client is an HTTP client for Swift inspired by the [objc.io networking talk](https://talk.objc.io/episodes/S01E01-networking)
 
 ## Setup
