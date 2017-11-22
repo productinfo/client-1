@@ -44,21 +44,45 @@ extension Resource where T: Decodable {
 
 // MARK: - Client Error
 
-enum ClientError: CustomStringConvertible {
+public enum ClientError: Error, CustomStringConvertible {
+    case clientError(HTTPStatusCode)
+    case serverError(HTTPStatusCode)
     case sessionError(Error)
+    case parseError(Error)
     case unknown
     
-    var description: String {
+    public var description: String {
         switch self {
         case .sessionError(let error):
             return "Session error: \(error)"
         case .unknown:
             return "Unknown error"
+        case .clientError(let statusCode):
+            return "Client error: \(statusCode)"
+        case .serverError(let statusCode):
+            return "Server error: \(statusCode)"
+        case .parseError(let parseError):
+            return "Parse error: \(parseError)"
         }
     }
     
+}
+
+// MARK: - Client Response
+
+public struct ClientResponse<T> {
+    
+    /// HTTP status code.
+    let httpStatusCode: HTTPStatusCode
+    
+    /// HTTP response.
+    let httpResponse: HTTPURLResponse
+    
+    /// Value
+    let value: T
     
 }
+
 
 // MARK: - Client
 
@@ -85,18 +109,42 @@ public class Client {
         self.session = session
     }
     
-    public func execute<T>(resource: Resource<T>) {
+    /// Executes the resource request and parse the response using the parser defined in the resource.
+    ///
+    /// - Parameters:
+    ///   - resource: resource whose request will be executed.
+    ///   - completion: completion callback.
+    public func execute<T>(resource: Resource<T>, completion: @escaping (Result<ClientResponse<T>, ClientError>) -> Void) {
         var request = resource.makeRequest(baseURLComponents)
         request = requestAdapter(request)
         session.dataTask(with: request) { (data, response, error) in
             if let error = error {
-                
-            } else if let response = response as? HTTPURLResponse, let data = data {
-                
+                completion(.failure(.sessionError(error)))
+            } else if let response = response as? HTTPURLResponse {
+                let statusCode = response.statusCodeEnum
+                if statusCode.isServerError {
+                    completion(.failure(.serverError(statusCode)))
+                } else if statusCode.isClientError {
+                    completion(.failure(.clientError(statusCode)))
+                } else {
+                    if let data = data {
+                        do {
+                            let value = try resource.parse(data)
+                            let valueResponse = ClientResponse(httpStatusCode: statusCode,
+                                                               httpResponse: response,
+                                                               value: value)
+                            completion(.success(valueResponse))
+                        } catch {
+                            completion(.failure(.parseError(error)))
+                        }
+                    } else {
+                        completion(.failure(.unknown))
+                    }
+                }
             } else {
-                
+                completion(.failure(.unknown))
             }
-        }.resume()
+            }.resume()
     }
     
 }
