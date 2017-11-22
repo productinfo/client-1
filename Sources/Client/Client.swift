@@ -150,3 +150,29 @@ public class Client {
 }
 
 
+let client = Client(baseURLComponents: URLComponents(string: "https://api.myservice.com")!)
+
+struct User: Codable {
+    let name: String
+}
+
+extension User {
+    var me: Resource<User> {
+        return Resource.jsonResource { (components: URLComponents) -> URLRequest in
+            var mutableComponents = components
+            mutableComponents.path = "/me"
+            var request = URLRequest(url: mutableComponents.url!)
+            request.httpMethod = "GET"
+            return request
+        }
+    }
+}
+
+client.execute(resource: User.me) { (result) in
+    if let error = result.error {
+        
+    } else if let value = result.value {
+        
+    }
+}
+
