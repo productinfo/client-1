@@ -1,0 +1,15 @@
+os:
+- osx
+language: generic
+osx_image: xcode9.1
+install:
+- gem install cocoapods
+before_script:
+- carthage update
+script:
+- swift build
+- xcodebuild -project Client.xcodeproj -scheme Client-iOS -config Debug -destination 'platform=iOS Simulator,name=iPhone 6,OS=11.1' clean build
+- xcodebuild -project Client.xcodeproj -scheme Client-macOS -config Debug clean build
+- xcodebuild -project Client.xcodeproj -scheme Client-tvOS -config Debug -destination 'platform=tvOS simulator,name=Apple TV,OS=11.1' clean build
+- xcodebuild -project Client.xcodeproj -scheme Client-watchOS -config Debug -destination 'platform=watchOS simulator,name=Apple Watch - 38mm,OS=4.1' clean build
+- pod lib lint --allow-warnings
