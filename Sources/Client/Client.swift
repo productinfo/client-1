@@ -18,7 +18,7 @@ public struct Resource<T> {
     /// - Parameters:
     ///   - makeRequest: function that generates the request.
     ///   - parse: function that parses the response into the resource object type.
-    init(makeRequest: @escaping (URLComponents) -> URLRequest,
+    public init(makeRequest: @escaping (URLComponents) -> URLRequest,
          parse: @escaping (Data) throws -> T) {
         self.makeRequest = makeRequest
         self.parse = parse
@@ -34,7 +34,7 @@ extension Resource where T: Decodable {
     ///
     /// - Parameter makeRequest: function that generates the request.
     /// - Returns: resource.
-    static func jsonResource(makeRequest: @escaping (URLComponents) -> URLRequest) -> Resource<T> {
+    public static func jsonResource(makeRequest: @escaping (URLComponents) -> URLRequest) -> Resource<T> {
         return Resource(makeRequest: makeRequest) { (data) -> T in
             return try JSONDecoder().decode(T.self, from: data)
         }
