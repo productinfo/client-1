@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "HTTPStatusCodes",
+        "repositoryURL": "https://github.com/rhodgkins/SwiftHTTPStatusCodes.git",
+        "state": {
+          "branch": null,
+          "revision": "14fd3126633b8e46a72ca7e2dc0e07141fa3140a",
+          "version": "3.1.2"
+        }
+      },
+      {
+        "package": "Result",
+        "repositoryURL": "https://github.com/antitypical/Result.git",
+        "state": {
+          "branch": null,
+          "revision": "7477584259bfce2560a19e06ad9f71db441fff11",
+          "version": "3.2.4"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

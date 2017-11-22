@@ -16,4 +16,6 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/pepibumur/client.git", :tag => s.version.to_s }
   s.source_files  = "Sources/**/*"
   s.frameworks  = "Foundation"
+
+  s.dependency 'Result', '~> 3.2.4'
 end
