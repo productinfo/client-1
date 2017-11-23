@@ -114,10 +114,10 @@ public class Client {
     /// - Parameters:
     ///   - resource: resource whose request will be executed.
     ///   - completion: completion callback.
-    public func execute<T>(resource: Resource<T>, completion: @escaping (Result<ClientResponse<T>, ClientError>) -> Void) {
+    public func execute<T>(resource: Resource<T>, completion: @escaping (Result<ClientResponse<T>, ClientError>) -> Void) -> URLSessionDataTask {
         var request = resource.makeRequest(baseURLComponents)
         request = requestAdapter(request)
-        session.dataTask(with: request) { (data, response, error) in
+        return session.dataTask(with: request) { (data, response, error) in
             if let error = error {
                 completion(.failure(.sessionError(error)))
             } else if let response = response as? HTTPURLResponse {
@@ -144,7 +144,7 @@ public class Client {
             } else {
                 completion(.failure(.unknown))
             }
-            }.resume()
+            }
     }
     
 }
