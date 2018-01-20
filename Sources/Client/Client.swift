@@ -11,7 +11,7 @@ public struct Resource<T> {
     fileprivate let makeRequest: (URLComponents) -> URLRequest
     
     /// Function that parses data into the resource object type.
-    fileprivate let parse: (Data) throws -> T
+    fileprivate let parse: (Data, HTTPURLResponse) throws -> T
     
     /// Default Resource initializer
     ///
@@ -19,7 +19,7 @@ public struct Resource<T> {
     ///   - makeRequest: function that generates the request.
     ///   - parse: function that parses the response into the resource object type.
     public init(makeRequest: @escaping (URLComponents) -> URLRequest,
-         parse: @escaping (Data) throws -> T) {
+         parse: @escaping (Data, HTTPURLResponse) throws -> T) {
         self.makeRequest = makeRequest
         self.parse = parse
     }
@@ -35,7 +35,7 @@ extension Resource where T: Decodable {
     /// - Parameter makeRequest: function that generates the request.
     /// - Returns: resource.
     public static func jsonResource(makeRequest: @escaping (URLComponents) -> URLRequest) -> Resource<T> {
-        return Resource(makeRequest: makeRequest) { (data) -> T in
+        return Resource(makeRequest: makeRequest) { (data, _) -> T in
             return try JSONDecoder().decode(T.self, from: data)
         }
     }
@@ -129,7 +129,7 @@ public class Client {
                 } else {
                     if let data = data {
                         do {
-                            let value = try resource.parse(data)
+                            let value = try resource.parse(data, response)
                             let valueResponse = ClientResponse(httpStatusCode: statusCode,
                                                                httpResponse: response,
                                                                value: value)
